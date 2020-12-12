@@ -1,10 +1,13 @@
 CC=gcc
-CFLAGS=-I.
-DEPS = bencode.h
-OBJ = bencode.o test_bencode.o 
+CFLAGS=-Wall -I.
+LDFlags=
+OBJFILES=bencode.o test_bencode.o 
+TARGET=test_bencode
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+all: $(TARGET)
 
-bencodemake: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+$(TARGET): $(OBJFILES)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
+
+clean:
+	rm -f $(OBJFILES) $(TARGET) *~

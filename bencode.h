@@ -19,3 +19,4 @@ typedef struct bc_node {
 
 bc_node_t *bcl_decode(char *bc_buf);
 long long int bcl_decode_int(char *bc_buf, size_t *n_parsed);
+char *bcl_decode_string(char *bc_buf, size_t *n_parsed);
