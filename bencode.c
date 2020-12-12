@@ -7,7 +7,7 @@
 // external libraries
 #include <bencode.h>
 
-
+/* Main recursive function */
 bc_node_t *bcl_decode(char *bc_buf) {
     // current node to be returned at this state of recursion
     bc_node_t *curr = malloc(sizeof(bc_node_t));
@@ -30,6 +30,15 @@ bc_node_t *bcl_decode(char *bc_buf) {
             bc_buf += n_parsed;
             break;
 
+        case 'l': // list
+            curr->type = LIST;
+            // init list here, just in case its empty list
+
+            bc_buf++;
+            while (*bc_buf != 'e') {
+                
+            }
+            break;
         default:
             //uhh
             printf("wat");
@@ -70,7 +79,6 @@ char *bcl_decode_string(char *bc_buf, size_t *n_parsed) {
     assert(*bc_buf == ':');
     *n_parsed += 1;
     bc_buf += 1;
-
 
     char *ret = malloc(str_size + 1);
     strncpy(ret, bc_buf, str_size);
