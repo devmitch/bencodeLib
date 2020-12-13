@@ -11,10 +11,10 @@ typedef struct list {
 } list_t;
 
 list_t *init_list();
-list_node_t *init_list_node();
 void list_add_tail(list_t *list, list_node_t *node);
 list_node_t *list_del_tail(list_t *list);
 
+// simplified version of the container_of() macro
 #define list_container(ptr, type, member) \
     ((type *)((char *)ptr - (size_t)(&((type *)0)->member)))
 

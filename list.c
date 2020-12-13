@@ -6,11 +6,6 @@ list_t *init_list() {
     return ret;
 }
 
-list_node_t *init_list_node() {
-    list_node_t *ret = malloc(sizeof(list_node_t));
-    return ret;
-}
-
 void list_add_tail(list_t *list, list_node_t *node) {
     if (list->tail != NULL) {
         list->tail->next = node;
