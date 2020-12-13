@@ -7,36 +7,44 @@
 // external libraries
 #include <bencode.h>
 
-/* Main recursive function */
 bc_node_t *bcl_decode(char *bc_buf) {
+    size_t n_parsed = 0;
+    return bcl_decode_inner(bc_buf, &n_parsed);
+}
+
+/* Main recursive function */
+bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed) {
     // current node to be returned at this state of recursion
     bc_node_t *curr = malloc(sizeof(bc_node_t));
     // number of characters parsed in helper functions (used to progress buffer)
-    size_t n_parsed = 0;
+    //size_t n_parsed = 0;
 
     switch (bc_buf[0]) {
         case 'i': // number
             curr->type = NUM;
             bc_buf++; // we will only give bcl_decode_int buffer starting from the numbers themselves, not i, so we can reuse elsewhere
-            curr->data.num = bcl_decode_int(bc_buf, &n_parsed);
+            curr->data.num = bcl_decode_int(bc_buf, n_parsed);
             // dont know if we actually need to progress buffer in this case but whatever
-            bc_buf += n_parsed;
+            bc_buf += *n_parsed;
             assert(*bc_buf == 'e');
             break;
         
         case '0' ... '9': // string
             curr->type = STR;
-            curr->data.str = bcl_decode_string(bc_buf, &n_parsed);
-            bc_buf += n_parsed;
+            curr->data.str = bcl_decode_string(bc_buf, n_parsed);
+            bc_buf += *n_parsed;
             break;
 
         case 'l': // list
             curr->type = LIST;
             // init list here, just in case its empty list
-
+            curr->data.list = init_list();
             bc_buf++;
+            size_t list_progress = 0;
             while (*bc_buf != 'e') {
-                
+                list_add_tail(curr->data.list, &bcl_decode_inner(bc_buf, &list_progress)->list_node);
+                bc_buf += list_progress;
+                list_progress = 0;
             }
             break;
         default:

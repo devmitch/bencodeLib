@@ -3,7 +3,7 @@
 #include <list.h>
 
 typedef struct my_struct {
-    // needs to be the actual data itself and not a pointer
+    // needs to be the actual object itself and not a pointer
     // if it was a pointer, it would be malloc'd on heap elsewhere
     // so the memory location of the actual node would be random
     // and couldnt find it with list_container()
