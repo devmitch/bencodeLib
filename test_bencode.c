@@ -14,7 +14,6 @@ void print_bencode_inner(bc_node_t *bc) {
             printf("%s", bc->data.str);
             break;
         case LIST:
-            //printf("found a list..?\n");
             printf("[");
             list_node_t *iter;
             int list_count = 1;
@@ -27,6 +26,23 @@ void print_bencode_inner(bc_node_t *bc) {
             }
             printf("]");
             break;
+            
+        case DICT:
+            printf("{");
+            list_node_t *dict_iter;
+            int dict_count = 1;
+            list_for_each(dict_iter, bc->data.dict) {
+                if (dict_count != 1) {
+                    printf(",");
+                }
+                print_bencode_inner(list_container(dict_iter, bc_dict_pair_t, list_node)->key);
+                printf("=>");
+                print_bencode_inner(list_container(dict_iter, bc_dict_pair_t, list_node)->value);
+                dict_count++;
+            }
+            printf("}");
+            break;
+        
         default:
             printf("WHAT IN THE FUCK\n");
             break;
@@ -51,5 +67,8 @@ int main() {
     print_bencode("ll4:testee");
     print_bencode("li6eli7eee");
     print_bencode("li420elllli5ei6e3:lolei9elel3:yepe2:okeei8eee");
+    print_bencode("d3:cow3:moo4:spam4:eggse");
+    print_bencode("d4:spaml1:a1:bee");
+    print_bencode("d6:eg_keyd9:inner_keyi69eee");
     return 0;
 }

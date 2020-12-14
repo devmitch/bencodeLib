@@ -51,6 +51,31 @@ bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed) {
             }
             *n_parsed += 1;
             break;
+
+        case 'd': //dict
+            curr->type = DICT;
+            curr->data.list = init_list();
+            bc_buf++;
+            *n_parsed += 1;
+            size_t dict_progress = 0;
+            while (*bc_buf != 'e') {
+                bc_dict_pair_t *pair = malloc(sizeof(bc_dict_pair_t));
+
+                pair->key = bcl_decode_inner(bc_buf, &dict_progress);
+                assert(pair->key->type == STR); //part of spec
+                bc_buf += dict_progress;
+                *n_parsed += dict_progress;
+                dict_progress = 0;
+
+                pair->value = bcl_decode_inner(bc_buf, &dict_progress);
+                bc_buf += dict_progress;
+                *n_parsed += dict_progress;
+                dict_progress = 0;
+                
+                list_add_tail(curr->data.list, &pair->list_node);
+            }
+            *n_parsed += 1;
+            break;
         default:
             //uhh
             printf("wat");
