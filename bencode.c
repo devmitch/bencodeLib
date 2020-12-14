@@ -9,7 +9,8 @@
 
 bc_node_t *bcl_decode(char *bc_buf) {
     size_t n_parsed = 0;
-    return bcl_decode_inner(bc_buf, &n_parsed);
+    bc_node_t *ret = bcl_decode_inner(bc_buf, &n_parsed);
+    return ret;
 }
 
 /* Main recursive function */
@@ -17,7 +18,6 @@ bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed) {
     // current node to be returned at this state of recursion
     bc_node_t *curr = malloc(sizeof(bc_node_t));
     // number of characters parsed in helper functions (used to progress buffer)
-    //size_t n_parsed = 0;
 
     switch (bc_buf[0]) {
         case 'i': // number
@@ -27,6 +27,7 @@ bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed) {
             // dont know if we actually need to progress buffer in this case but whatever
             bc_buf += *n_parsed;
             assert(*bc_buf == 'e');
+            *n_parsed += 2; //includes the i and e. this is so janky lol 
             break;
         
         case '0' ... '9': // string
@@ -40,18 +41,20 @@ bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed) {
             // init list here, just in case its empty list
             curr->data.list = init_list();
             bc_buf++;
+            *n_parsed += 1;
             size_t list_progress = 0;
             while (*bc_buf != 'e') {
                 list_add_tail(curr->data.list, &bcl_decode_inner(bc_buf, &list_progress)->list_node);
                 bc_buf += list_progress;
+                *n_parsed += list_progress;
                 list_progress = 0;
             }
+            *n_parsed += 1;
             break;
         default:
             //uhh
             printf("wat");
     }
-
     return curr;
 
 }

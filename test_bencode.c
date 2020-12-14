@@ -3,30 +3,53 @@
 
 #include <bencode.h>
 
-int main() {
-    char *test = strdup("i69e");
-    bc_node_t *decoded_struct = bcl_decode(test);
-    printf("%s decoded becomes %d\n", test, decoded_struct->data.num);
-
-    char *test2 = strdup("i-60e");
-    bc_node_t *decoded_struct2 = bcl_decode(test2);
-    printf("%s decoded becomes %d\n", test2, decoded_struct2->data.num);
-
-    char *test3 = strdup("4:spam");
-    bc_node_t *decoded_struct3 = bcl_decode(test3);
-    printf("%s decoded becomes %s.\n", test3, decoded_struct3->data.str);
-    
-    char *test4 = strdup("0:");
-    bc_node_t *decoded_struct4 = bcl_decode(test4);
-    printf("%s decoded becomes %s.\n", test4, decoded_struct4->data.str);
-
-    char *list1 = strdup("l4:spam4:eggse");
-    bc_node_t *decoded_list1 = bcl_decode(list1);
-
-    list_node_t *iter;
-    list_for_each(iter, decoded_list1->data.list) {
-        bc_node_t *curr_struct = list_container(iter, bc_node_t, list_node);
-        printf("item in list is %s\n", curr_struct->data.str);
+void print_bencode_inner(bc_node_t *bc) {
+    //printf("starting inner run\n");
+    //printf("current node type = %d\n", bc->type);
+    switch (bc->type) {
+        case NUM:
+            printf("%d", bc->data.num);
+            break;
+        case STR:
+            printf("%s", bc->data.str);
+            break;
+        case LIST:
+            //printf("found a list..?\n");
+            printf("[");
+            list_node_t *iter;
+            int list_count = 1;
+            list_for_each(iter, bc->data.list) {
+                if (list_count != 1) {
+                    printf(",");
+                }
+                print_bencode_inner(list_container(iter, bc_node_t, list_node));
+                list_count++;
+            }
+            printf("]");
+            break;
+        default:
+            printf("WHAT IN THE FUCK\n");
+            break;
     }
+}
+
+void print_bencode(char *bc_buf) {
+    printf("|%s| is decoded as: \n", bc_buf);
+    char *buf = strdup(bc_buf);
+    bc_node_t *decoded_struct = bcl_decode(buf);
+    print_bencode_inner(decoded_struct);
+    printf("\n\n");
+}
+
+int main() {
+    print_bencode("i69e");
+    print_bencode("i-60e");
+    print_bencode("4:spam");
+    print_bencode("0:");
+    print_bencode("l4:spam4:eggse");
+    print_bencode("le");
+    print_bencode("ll4:testee");
+    print_bencode("li6eli7eee");
+    print_bencode("li420elllli5ei6e3:lolei9elel3:yepe2:okeei8eee");
     return 0;
 }
