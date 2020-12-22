@@ -27,6 +27,7 @@ typedef struct bc_dict_pair {
 } bc_dict_pair_t;
 
 bc_node_t *bcl_decode(char *bc_buf);
+void bcl_dump(bc_node_t *bc);
 bc_node_t *bcl_decode_inner(char *bc_buf, size_t *n_parsed);
 long long int bcl_decode_int(char *bc_buf, size_t *n_parsed);
 char *bcl_decode_string(char *bc_buf, size_t *n_parsed);

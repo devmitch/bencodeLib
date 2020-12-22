@@ -123,3 +123,46 @@ char *bcl_decode_string(char *bc_buf, size_t *n_parsed) {
 
     return ret;
 }
+
+void bcl_dump(bc_node_t *bc) {
+    switch (bc->type) {
+        case NUM:
+            printf("%d", bc->data.num);
+            break;
+        case STR:
+            printf("%s", bc->data.str);
+            break;
+        case LIST:
+            printf("[");
+            list_node_t *iter;
+            int list_count = 1;
+            list_for_each(iter, bc->data.list) {
+                if (list_count != 1) {
+                    printf(",");
+                }
+                bcl_dump(list_container(iter, bc_node_t, list_node));
+                list_count++;
+            }
+            printf("]");
+            break;
+            
+        case DICT:
+            printf("{");
+            list_node_t *dict_iter;
+            int dict_count = 1;
+            list_for_each(dict_iter, bc->data.dict) {
+                if (dict_count != 1) {
+                    printf(",");
+                }
+                bcl_dump(list_container(dict_iter, bc_dict_pair_t, list_node)->key);
+                printf("=>");
+                bcl_dump(list_container(dict_iter, bc_dict_pair_t, list_node)->value);
+                dict_count++;
+            }
+            printf("}");
+            break;
+        
+        default:
+            break;
+    }
+}
